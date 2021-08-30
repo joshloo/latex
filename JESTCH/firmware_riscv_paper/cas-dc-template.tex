@@ -47,10 +47,10 @@
 	This is an open access article under the CC BY-NC-ND license (\url{http://creativecommons.org/licenses/by-nc-nd/4.0/}).
 }
 
-\bookmark[named = FirstPage]{A Simulated Firmware and Security Study on X86, ARM, RISC-V Platform and Security Enhancement For RISC-V} % Title bookmark used in the pdf
+\bookmark[named = FirstPage]{A Firmware Assessment Study on X86, ARM, RISC-V Platform and FPGA Realisation of Security Enhancement For RISC-V} % Title bookmark used in the pdf
 %**************** If the title is short, stay on the first line use [mode = short_title] otherwise ******************
 %***************************************** use [mode = title] below ***************************************
-\title [mode = title]{A Simulated Firmware Study on X86, ARM, RISC-V Platform and Security Enhancement For RISC-V}    
+\title [mode = title]{A Firmware Assessment Study on X86, ARM, RISC-V Platform and FPGA Realisation of Security Enhancement For RISC-V}    
 
 % Title mark notes if desired
 %\tnotemark[1,2]
@@ -69,7 +69,18 @@
 \address[2]{USM, Malaysia}
 
 \begin{abstract} 
-There are many well-known open-source bootloaders solutions available today such as UEFI/BIOS, Coreboot and Uboot. Recently, RISC-V as an open-source Instruction Set Architecture, has gained a lot of attention in new embedded products creation and academic research purpose. In this study, x86, ARM and RISC-V Instruction Set Architecture boot flow and boot solutions are studied, simulated, experimented, and summarized. Security feature is implemented in firmware and measured against non-secured firmware to compare boot performance without security inclusion. A new proposed method to create a security block in Register Transfer Level to generate Secure Hash Algorithms 5 digest is implemented using Field Programmable Gate Array. The performance of this method is analyzed with the numbers of logic gate required and the execution time in software versus hardware. As a result of this study, it is observed that in simulated environment, secured firmware incurred 3.3 Megabytes of additional binary size and 747ms (35 \%) additional boot time compared to non-secured firmware. A hardware implementation is proposed in Field Programmable Gate Array (FPGA) to reduce the need for a larger size firmware and longer boot time to implement security. The results of this implementation indicate a requirement of 32,048 gates to implement a SHA512 IP that reduce software execution time by 1132 \%.  
+There are many well-known open-source bootloaders solutions available today such as UEFI/BIOS, Coreboot and Uboot.
+Recently, RISC-V as an open-source Instruction Set Architecture, has gained a lot of attention in new embedded products
+creation and academic research purpose. In this study, x86, ARM and RISC-V Instruction Set Architecture boot flow and
+boot solutions are studied, simulated, experimented, and summarized. Security feature is implemented in firmware and
+measured against non-secured firmware to compare boot performance without security inclusion. A new proposed method
+to create a security block in Register Transfer Level to generate Secure Hash Algorithms 5 digest is implemented using Field
+Programmable Gate Array. The performance of this method is analyzed with the numbers of logic gate required and the
+execution time in software versus hardware. As a result of this study, it is observed that in simulated environment, secured
+firmware incurred 3.3 Megabytes of additional binary size and 747ms (35 \%) additional boot time compared to non-secured
+firmware. A hardware implementation is proposed in Field Programmable Gate Array (FPGA) to reduce the need for a larger
+size firmware and longer boot time to implement security. The results of this implementation indicate a requirement of
+32,048 gates to implement a SHA512 IP that reduce software execution time by 1132 \%.  
 \end{abstract}
 
 % Article history - Should only be set by an editor
@@ -88,87 +99,275 @@ Firmware
 \section{Introduction}
 All compute devices today are powered by a few processors Instruction Set Architectures
 (ISAs), predominantly x86, AMD, ARM, and MIPS which is later converged to RISC-V in
-2021 (Jim Turley, EE Journal, 2021). These ISAs provide flexibilities and extensibilities to the
+2021  \cite{R5:1}. These ISAs provide flexibilities and extensibilities to the
 different engineering audiences, creating tremendous opportunities today that benefits
 consumer in many custom applications and use cases, especially in the booming edge devices
-in Internet of Things world.
-While having multiple ISA options are good, it is often difficult to make a good decision on
-which architecture to go for, because there are many factors that contribute to design decision.
-Several key elements of consideration while picking an ISA are as below.
-1. Time-To-Market (TTM)
+in Internet of Things world. While having multiple ISA options are good, it is often difficult to
+make a good decision on which architecture to go for, because there are many factors that
+contribute to design decision. Several key elements of consideration while picking an ISA are as below.
+
+\begin{enumerate}
+\itemsep=-1pt 		% Adjusting item separation
+\itemindent=0pt 	% Extra indentation from the left margin if necessary
+\item 
+Time-To-Market (TTM) \\ \\
 The TTM factor is about how easy it is to enable an embedded system with collaterals
 provided by the ISA provider. For example, the development time of an engineering team
 (often called OEM/ODM) taking a new 11th Generation Intel chip and providing a full
 solution with it. Several key factors that directly impact TTM are the availabilities of
-documentation, system level open-source references and manufacturing technology.2
-2. Cost
+documentation, system level open-source references and manufacturing technology.
+\\
+
+\item 
+Cost \\ \\
 This factor includes cost of licensing, software, and hardware development cost that the
 OEM/ODM needs to pay to get the products released.
-3. Design flexibilities
+\\
+
+\item 
+Design flexibilities \\ \\
 The design flexibilities revolve around two key questions of “How easy it is to include a
 new custom IP in a new design?” and “How easy it is to land firmware, driver, and
 software support of a new IP?"
-
+\end{enumerate}  
 
 \subsection{Problem Statements}
-An ideal SOC would not only needs to be functional, but also be protected since the very early initialization flow to ensure no malicious code can be injected at any point before arriving at user space applications. To achieve this, firmware architecture becomes an important topic of exploration to identify the security scheme offered with different ISA and how a generic security approach can be deployed to implement security in each of them.
-The gap of today’s security scheme is the ease of deployment whereby the enablers and users would often end up disabling security just to improve the performance of the system, reduce the TTM and product price. The consequence of this problem will be more unsecured devices being in the market, causing risks to everyone in the IOT chain. Therefore, this research will focus on identifying the boot elements of each ISA, methodology to enable secure boot, and how a security IP block can be added to the register transfer and firmware level to facilitate security such that it does not significantly jeopardize system performance and is easy to enable without much additional software development.
+An ideal SOC would not only needs to be functional, but also be protected since the very early
+initialization flow to ensure no malicious code can be injected at any point before arriving at
+user space applications. To achieve this, firmware architecture becomes an important topic
+of exploration to identify the security scheme offered with different ISA and how a generic
+security approach can be deployed to implement security in each of them. The gap of today’s
+security scheme is the ease of deployment whereby the enablers and users would often end up
+disabling security just to improve the performance of the system, reduce the TTM and product price.
+The consequence of this problem will be more unsecured devices being in the market,
+causing risks to everyone in the IOT chain. Therefore, this research will focus on identifying the
+boot elements of each ISA, methodology to enable secure boot, and how a security IP block
+can be added to the register transfer and firmware level to facilitate security such that it
+does not significantly jeopardize system performance and is easy to enable without much
+additional software development.
 
 
 \subsection{ Objectives}
-With the problem statement described, three key objectives are identified for this research.
-1.	To simulate each ISAs boot flow and identify the key components that differentiate each of them from the firmware developers’ perspective.
-2.	To evaluate the secure firmware feature and measure it against boot performance.
-3.	To propose and implement security enhancement through Field Programmable Gate Array (FPGA) for firmware booting mechanism with the evaluated security features of an open-source ISA. This enhancement could be potentially scale to close-source ISA.
+With the problem statement described, the key objective identified for this research is to
+evaluate the secure firmware feature, measure it against boot performance, and propose
+security enhancement through Field Programmable Gate Array (FPGA) for firmware booting
+mechanism with the evaluated security features of an open-source ISA. This enhancement
+could be potentially scale to close-source ISA.
 
+
+\subsection{ Previous work}
+In the past, many researches related to security features available in different ISA had been carried out.
+Ning et al analyzed several hardware assisted TEE such as Intel SGX, ARM TrustZone Technology
+and AMD SEV, and evaluated the feasibility of deploying them on edge compute infrastructure by evaluating the performance overhead \cite{R5:2}.
+More security and performance benchmark study had been carried out by Christian et al and it has been discovered that AMD SEV has the best benchmark with memory protection mechanism at execution speed of near native speed compared to Intel SGX \cite{R5:3}.
+Other than performance evaluation, there are also comparative study on multiple ISAs. Geraldine et
+al summarized some key challenges of security features, short coming of ARM TrustZone and Intel SGX, and proposed countermeasures in RISC-V architecture that address its defined thread models \cite{R5:4}.
+In respective targeted technology domain, Pascal et al proposed HECTOR-V, a RISC-V based architecture to improve on the flexibilities of peripherals’ permission management \cite{R5:5}.Victor et al on the other hand, proposed Sanctum, a RISC-V based TEE to improve on software isolation with comparison to Intel SGX  \cite{R5:6}. There are also several researches that provide deep dive study and survey on existing technologies, for example, Intel SGX was deeply explained from different aspects from the technology use cases to vulnerabilities by Victor et al \cite{R5:7}, an ARM TrustZone comprehensive survey was carried out by Sandro et al \cite{R5:8} and multiple System Management Mode usage model for security purposes was analyzed by William in his PHD report \cite{R5:9}.
 
 \section{ Proposed Method}
-The workflow to propose the methodology for this research is demonstrated in Figure 3.1. In section 3.2, the platform alternatives are compared and selected. In section 3.3, secure boot implementation is proposed for RISC-V with firmware implementation in software emulated environment (QEMU). In section 3.4, secure boot implementation is proposed for RISC-V with RTL implementation in FPGA hardware environment. In section 3.5, experiments and parameters are proposed to evaluate the firmware and RTL implementation. In section 3.6, the chapter is summarized.
+The approach of the research to propose the methodology and collect results is demonstrated in Figure 1. In section 2.1, the platform alternatives are compared and selected. In section 2.2, secure boot implementation is proposed for RISC-V with firmware implementation in software emulated environment (QEMU). In section 2.3, secure boot implementation is proposed for RISC-V with RTL implementation in FPGA hardware environment. In section 2.4, experiments and parameters are proposed to evaluate the firmware and RTL implementation.
+
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.35\textwidth,height=2.5in]{figs/ResearchApproach.JPG}
+	\caption{Research Approach}
+\end{figure}
+
 
 \subsection{ Platform Selection}
-A comparison between these platforms is created, considering the factor of cost, scalability, availability of resource, and configurability as illustrated in Table 3.1
+A comparison between software emulation (QEMU), reference boards, and FPGA is created, considering the factor of cost, scalability, availability of resource, and configurability as illustrated in Table 1. As a result of the comparison, QEMU and FPGA are selected for software emulation and hardware enhancement experiment purpose. The QEMU installed is version 6.0.0 on Ubuntu 20.04.2.0 LTS. The FPGA board chosen is Xilinx Nexys A7 DDR4 board with Artix-50T FPGA as Figure 2 because of its affordable price (\$229) and sufficient logic gate for low scale security level exploration. This FPGA is also supported by a few RISC-V projects, such as NEORV32.
+
+\begin{table}[hbt!]
+\caption{Platform Comparison}
+    \begin{tabular}{|p{0.1\linewidth} | p{0.1\linewidth} | p{0.1\linewidth} | p{0.3\linewidth} | p{0.2\linewidth} |}
+        \hline
+        Platform & Unit Cost & Scalability & Availability of resources & Configurability \\
+        \hline 
+        QEMU & None & High & Many firmware solutions support is available on the market as open source.   & High   \\
+        \hline
+        Reference boards & Low & Low & Different board supports different ISA and different firmware solution. The support comes from OEM and is usually closed source    & Low \\
+        \hline
+       FPGA & Medium-High & Medium & Several open-source projects are available for RISC-V. However, for x86 and ARM, most of the design is closed source    & High \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.5\textwidth,height=2in]{figs/Nexys.JPG}
+	\caption{FPGA Selected}
+\end{figure}
 
 
 \subsection{ Secure Boot in Software/QEMU}
-The flow to identify secure boot ingredient has two key steps. Both steps are demonstrated as Figure 3.3, whereby the firmware is first being compiled and executed without any secure boot ingredient, then showcase how inject secure boot code and execute the firmware. The general boot flow demonstrated uses SEC core, PEI core, DXE core and BDS core as demonstrated by Figure 2.1. As each core are compiled as separate binaries, each of the binaries can be hashed and verified.
+The flow to identify secure boot ingredient has two key flows. The difference between the 2 flows are demonstrated as Figure 3, whereby the firmware is first being compiled and executed without any secure boot ingredient, then showcase how inject secure boot code and execute the firmware. As the firmware code boot stages are compiled as separate binaries, each of the binaries can be then hashed and verified.
 
-Based on the flow described in figure 3.2, the potential to apply UEFI secure boot to the existing RISC-V boot with UEFI framework on x86 QEMU is identified. The idea is to inject security stack in UEFI PEI and DXE phase so that the RISCV UEFI boot flow can have secure boot encapsulated. This topic was flagged as a potential enabling item by RISC-V presentation (Schaefer, 2021). The security stack by UEFI services had been made available with OpenSSL as the underlayer library and a comprehensive technical report of this describing how to sign and incorporate the keys has been created by (National Security Agency, 2020). The security driver injection in the common UEFI services FDF and DSC file (Jarlstrom, 2017) is demonstrated as Figure 3.4.
+Figure 4 describes the potential to apply UEFI secure boot to the existing RISC-V boot with the existing UEFI framework on x86 QEMU. The idea is to inject security stack in UEFI PEI and DXE phase so that the RISCV UEFI boot flow can have secure boot encapsulated. This topic was flagged as a potential enabling item by RISC-V presentation \cite{R5:10}. The security stack by UEFI services had been made available with OpenSSL as the underlayer library and a comprehensive technical report of this describing how to sign and incorporate the keys has been created by \cite{R5:11}.
 
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.5\textwidth,height=3in]{figs/SoftwareSecureBootFlow.JPG}
+	\caption{SoftwareSecureBootFlow}
+\end{figure}
+
+
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.5\textwidth,height=3in]{figs/SecureBootOnRISCV.JPG}
+	\caption{UEFI Secured Boot on RISC-V}
+\end{figure}
 
 \subsection{ Hardware implementation through FPGA}
-Another part of the methodology is to propose a method to replace these secure boot services with RTL instead of bootloader code to effectively reduce flash size and improve boot performance. To achieve this, an open-source RISCV processor (NEORV32) is used as an initial environment. SHA512 digest generation block is then added to the RTL of NEORV32, and the digest generated is passed to bootloader via a new read only register block through the custom functions subsystem (CFS) IP. With this implementation, bootloader will no longer need to contain and execute security code to achieve security purpose. A bird-eye view of what is being added is illustrated in green boxes of Figure 3.5. The IP are customized to introduce an additional arbitration block with state machine that is capable to map the boot rom content to be sent to SHA512 security block to produce digest. Once digest data is produced, the arbitration block will notify custom functions subsystem block with a status complete bit together with 512-bit SHA information. 
+Another part of the methodology is to propose a method to replace these secure boot services with RTL instead of bootloader code to effectively reduce flash size and improve boot performance. To achieve this, an open-source RISCV processor (NEORV32) is used as an initial environment. SHA512 digest generation block is then added to the RTL of NEORV32, and the digest generated is passed to bootloader via a new read only register block through the custom functions subsystem (CFS) IP. With this implementation, bootloader will no longer need to contain and execute security code to achieve security purpose. A bird-eye view of what is being added is illustrated in green boxes of Figure 5. The IP are customized to introduce an additional arbitration block with state machine that is capable to map the boot rom content to be sent to SHA512 security block to produce digest. Once digest data is produced, the arbitration block will notify custom functions subsystem block with a status complete bit together with 512-bit SHA information. 
+
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.5\textwidth,height=2.5in]{figs/HardwareSecureBootBlock.JPG}
+	\caption{Hardware Secure Boot Block}
+\end{figure}
 
 
+Figure 6 and figure 7 demonstrates the detailed comparison of system port map after Arbiter and SHA512 core is being added to NEOV32 CPU processor. The details of how the SHA512 core and arbiter block from signals level and how they are being consumed is described subsequently.
 
-Figure 3.6 and figure 3.7 demonstrates the detailed comparison of system port map after Arbiter and SHA512 core is being added to NEOV32 CPU processor. The details of how the SHA512 core and arbiter block from signals level and how they are being consumed is described subsequently.
+Based on the connections shown in Figure 7, during normal boot up process, NEORV32 CPU fetches instructions from bootloader ROM to execute. The amount of memory mapped IO and functionalities depend heavily on how the CPU is connected to data bus and in this case, the custom functions system block. The custom functions system block defines an interface consist of offset of each data that bootloader can read and write data from. The SHA512 Core block is responsible for taking in blocks of data to hash, and then provide output of the digest once completed. Arbiter is the middleman which controls the operation of taking ROM data and send to SHA512 Core to be hashed. Once the hash operation is completed, the digest and the completion status will then be shared with custom functions system to be accessible by CPU, which translate to software accessible registers.
 
-Based on the connections shown in Figure 3.7, during normal boot up process, NEORV32 CPU fetches instructions from bootloader ROM to execute. The amount of memory mapped IO and functionalities depend heavily on how the CPU is connected to data bus and in this case, the custom functions system block. The custom functions system block defines an interface consist of offset of each data that bootloader can read and write data from. The SHA512 Core block is responsible for taking in blocks of data to hash, and then provide output of the digest once completed. Arbiter is the middleman which controls the operation of taking ROM data and send to SHA512 Core to be hashed. Once the hash operation is completed, the digest and the completion status will then be shared with custom functions system to be accessible by CPU, which translate to software accessible registers.
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.4\textwidth,height=1.5in]{figs/SystemPortMap-Original.JPG}
+	\caption{System port map of components without security block}
+\end{figure}
 
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.4\textwidth,height=2in]{figs/SystemPortMap-Amended.JPG}
+	\caption{System port map of components to implement additional security block}
+\end{figure}
+
+
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.4\textwidth,height=4in]{figs/StateMachine.JPG}
+	\caption{State machine of arbitration block}
+\end{figure}
+
+
+The state machine of the arbiter is further designed as Figure 8. It begins with Idle state when everything is initialized to 0. A counter is implemented to keep track of the ROM blocks left to transfer from ROM block to SHA512 core. In send data state, the arbiter will set ROM\_data\_ready for SHA512 block to consume that block of 1024 bits data, then transition to toggle data ready bit state to toggle ROM\_data\_ready bit to 0 and decrement the counter so that the next send data state will transfer next chunk of data to SHA512 core to be processed. Once all blocks had been sent to SHA512 core. It will wait for SHA512 block to respond with SHA\_complete. Once SHA\_complete is set to 1, it will enter a complete state and update the SHA data to custom functions system block together with the SHA\_complete status bit.
+
+\subsection{ Proposed experiments}
+The experiment proposed to evaluate the methodology includes 3 parameters.
+\begin{enumerate}
+\itemsep=-1pt 		% Adjusting item separation
+\itemindent=0pt 	% Extra indentation from the left margin if necessary
+\item 
+Boot performance (time used to boot the firmware)
+\item 
+Firmware size (size of the compiled binary)
+\item 
+Number of logic gates consumed in RTL (FPGA resource consumed)
+\end{enumerate}
+
+To prove secured boot implementation, negative testing will be performed using unauthorized EFI applications that mimics malicious software to demonstrate that only signed applications can be executed. Therefore, the flow of experiments is planned with sequence below. \\
+
+Software QEMU:
+\begin{enumerate}
+\itemsep=-1pt 		% Adjusting item separation
+\itemindent=0pt 	% Extra indentation from the left margin if necessary
+\item 
+Compile a normal unsecured UEFI firmware for x86 and RISC-V.
+\item 
+Execute the UEFI firmware in QEMU, boot to Shell and capture the boot log.
+\item 
+Compile a secured UEFI firmware.
+\item 
+Execute the UEFI firmware in QEMU, boot to Shell and capture the boot log.
+\item 
+Perform negative testing with signed and unsigned EFI application using the secured UEFI firmware.
+\item 
+Capture the boot time of secured and unsecured firmware.
+\item 
+Compare the impact to boot time after incorporated security.
+\item 
+Capture the binary size of secured and unsecured firmware.
+\item 
+Compare the impact to firmware binary size after incorporated security.
+\end{enumerate}
+
+
+Hardware FPGA:
+\begin{enumerate}
+\itemsep=-1pt 		% Adjusting item separation
+\itemindent=0pt 	% Extra indentation from the left margin if necessary
+\item 
+Implement the SHA512 block that interacts with other components in NEORV32 RISC-V processor.
+\item 
+Capture the SHA512 digest generated by the SHA512 block and compare with the output of software execution to verify the correctness in functionality.
+\item 
+Capture the SHA512 digest generation time and compare with software execution time to verify the performance.
+\item 
+Capture the boot log of NEORV32 firmware to verify the ability to access SHA512 digest generated by RTL in bootloaders.
+\end{enumerate}
 
 \section{ Results/Discussion}
-In section 4.2, from firmware size perspective, results collected indicates that non-secure UEFI firmware has a total of 7,602,384 bytes, while secure UEFI firmware has a total of 10,895,864 bytes. Therefore, it is deduced that from software perspective, implementing security in firmware will add additional 3.292 Megabytes (10.895M – 7.602M) of additional binary size.
+From functional correctness perspective, secured boot is configured as Figure 9. With secure boot enabled, only application software that is being signed with the same keys will be able to execute. To validate this behavior, an unsigned “Hello World” application and a signed “Hello World” application is attempted to execute in EFI Shell environment. Figure 10 shows the unsigned application and Figure 11 shows the signed application. The commit ID used to produce this result is 392836a for efitools repository and 75e9154f81 for EDK2 repository.
 
-In terms of boot speed, it is observed that non-secure firmware took 2092 milliseconds to boot while secure firmware took 2839 milliseconds to boot. Therefore, it is deduced that there are an additional 747 milliseconds (2839ms – 2092ms) additional boot time that secured firmware has in extra, compared to non-secured firmware, which is 747ms/2092ms * 100 = 35.7\%.
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.5\textwidth,height=3in]{figs/SecureBootConfiguration.JPG}
+	\caption{Secure boot configuration}
+\end{figure}
 
-In section 4.3, from hardware perspective, results collected indicates that a RISC-V based NEORV32 without any additional security implementation will consume 19,785 logic gates, while a NEORV32 with the addition of arbiter and SHA512 block consumes 51,833 logic gates. Therefore, it is deduced that implementing security in RTL will add 32,048 logic gates. In terms of security execution speed comparison, it is observed that producing a SHA512 digest for 896 bits data will take 257us with software while RTL implementation takes 227ns. The performance advantage is therefore 257u/227n * 100 = 1132\%.
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.5\textwidth,height=3in]{figs/SecureBootUnsigned.JPG}
+	\caption{Load unsigned "Hello World" application}
+\end{figure}
 
+% Span figure example on double column
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.5\textwidth,height=3in]{figs/SecureBootSigned.JPG}
+	\caption{Loading signed "Hello World" application}
+\end{figure}
 
+From firmware size perspective, results collected indicates that non-secure UEFI firmware has a total of 7,602,384 bytes, while secure UEFI firmware has a total of 10,895,864 bytes. Therefore, it is deduced that from software perspective, implementing security in firmware will add additional 3.292 Megabytes (10.895M – 7.602M) of additional binary size.
+
+In terms of boot speed, it is observed that non-secure firmware took 2092 milliseconds to boot while secure firmware took 2839 milliseconds to boot in QEMU. Therefore, it is deduced that there are an additional 747 milliseconds (2839ms – 2092ms) additional boot time that secured firmware has in extra, compared to non-secured firmware, which is 747ms/2092ms * 100 = 35.7\%.
+
+From hardware perspective, results collected indicates that a RISC-V based NEORV32 without any additional security implementation will consume 19,785 logic gates, while a NEORV32 with the addition of arbiter and SHA512 block consumes 51,833 logic gates. Therefore, it is deduced that implementing security in RTL will add 32,048 logic gates. In terms of security execution speed comparison, it is observed that producing a SHA512 digest for 896 bits data will take 257us with software while RTL implementation takes 227ns. The performance advantage is therefore 257u/227n * 100 = 1132\%.
+
+\begin{table}[hbt!]
+\caption{Hardware and Software Performance Comparison}
+    \begin{tabular}{|p{0.3\linewidth} | p{0.4\linewidth} |}
+        \hline
+         & Execution Time with 2.2GHz frequency CPU using same set of data \\
+        \hline 
+        Software execution & 257 us  \\
+        \hline
+        Hardware execution & 227 ns \\
+        \hline
+    \end{tabular}
+\end{table}
 
 \section{ Conclusion}
-The first objective of this research, which is to study each ISA and key boot factors in details, is accomplished and outlined in the comprehensive literature review describing boot flow, secure firmware solutions and RISC-V projects.
+The objective of this research, which is to study each ISA security schemes, identify and evaluate boot performance with different secure boot scheme, and propose a security enhancement mechanism with open-source ISA, is accomplished. The boot time and boot size impact of implementing hashing for firmware is highlighted in Slim Bootloader verified boot comparison, which indicates that secured firmware incurred 3.3 Megabytes of additional binary size and 747ms (35\%) additional boot time compared to non-secured firmware. The hardware implementation also indicates that it requires an additional 32,048 logic gates to implement a SHA512 IP that reduce software execution time by 1132\%.
 
-The second objective, which is to identify boot performance and evaluation with different secure boot scheme and performance, is accomplished with experiments carried out with x86 QEMU and RISC-V QEMU, along with RISC-V secure boot enable activities in methodology. The boot time impact of hashing for firmware is also highlighted in Slim Bootloader verified boot capture. It is observed that secured firmware incurred 3.3 Megabytes of additional binary size and 747ms (35\%) additional boot time compared to non-secured firmware.
-
-The third objective, which is to propose a security enhancement mechanism with open-source ISA, is accomplished by the RISC-V SHA512 secure boot enablement carried out with Xilinx FPGA hardware. Based on the results, it is observed that the results of this implementation indicate a requirement of additional 32,048 logic gates to implement a SHA512 IP that reduce software execution time by 1132\%.
-
-
-\subsubsection{Future Work}
-Although this thesis has demonstrated the secure boot implementations with QEMU and FPGA hardware, the work to enable security with minimal firmware or software involvement does not stop here. The problem statement of reducing ROM size and boot performance will drive multiple areas of enhancement. One example is how the configuration to update the RTL security scheme at runtime can be provided for better user experience. A good suggestion is through a IOT IP with manageability mechanism for Over-The-Air (OTA) update, connecting with RISC-V network on chip cores, such as the OpenPiton Network on Chip (NOC) project and have a secure channel to modify the key hashes. This is another topic of research area that can be proposed and presented with industrial use cases with business opportunities to introduce such features on Internet of Things secured devices.
+Although this paper has demonstrated the secure boot implementations with QEMU and FPGA hardware, there are some enhancement to be done to enable security with minimal firmware or software involvement, driven by the initial problem statement. One example is how the configuration to update the RTL security scheme at runtime can be provided for better user experience. A suggestion is through a network IP with manageability mechanism for Over-The-Air (OTA) update, connecting with RISC-V network on chip cores, such as the OpenPiton Network on Chip (NOC) project and have a secure channel to modify the key hashes. This is another topic of research area that can be proposed and presented with industrial use cases with business opportunities to introduce such features on IOT secured devices.
 
 \section*{Acknowledgment}
-The authors would like to thank the editors and anonymous
-reviewers for providing insightful suggestions and comments
-to improve the quality of research paper.
+The authors would like to thank USM for the support and Intel for the sponsorship.
+
+\bibliography{reference} 
+\bibliographystyle{ieeetr}
 
 \vskip6pt
 
