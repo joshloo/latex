@@ -47,10 +47,10 @@
 	This is an open access article under the CC BY-NC-ND license (\url{http://creativecommons.org/licenses/by-nc-nd/4.0/}).
 }
 
-\bookmark[named = FirstPage]{A Firmware Assessment Study on X86, ARM, RISC-V Platform and FPGA Realisation of Security Enhancement For RISC-V} % Title bookmark used in the pdf
+\bookmark[named = FirstPage]{Design and Implementation of Secure Boot Architecture on RISC-V using FPGA} % Title bookmark used in the pdf
 %**************** If the title is short, stay on the first line use [mode = short_title] otherwise ******************
 %***************************************** use [mode = title] below ***************************************
-\title [mode = title]{A Firmware Assessment Study on X86, ARM, RISC-V Platform and FPGA Realisation of Security Enhancement For RISC-V}    
+\title [mode = title]{Design and Implementation of Secure Boot Architecture on RISC-V using FPGA}    
 
 % Title mark notes if desired
 %\tnotemark[1,2]
@@ -63,10 +63,10 @@
 %   another line in the footnotes area of the first page.}
 
 \author[1]{Loo, Tung Lun}
-\address[1]{Sungai Petani, 08000 Kedah, Malaysia}
+\address[1]{School of Electrical and Electronic Engineering, Universiti Sains Malaysia, 14300, Nibong Tebal, Pulau Pinang, Malaysia.}
 
 \author[2]{Mohamad Khairi Ishak}
-\address[2]{USM, Malaysia}
+\address[2]{School of Electrical and Electronic Engineering, Universiti Sains Malaysia, 14300, Nibong Tebal, Pulau Pinang, Malaysia.}
 
 \begin{abstract} 
 There are many well-known open-source bootloaders solutions available today such as UEFI/BIOS, Coreboot and Uboot.
@@ -106,9 +106,10 @@ in Internet of Things world. While having multiple ISA options are good, it is o
 make a good decision on which architecture to go for, because there are many factors that
 contribute to design decision. Several key elements of consideration while picking an ISA are as below.
 
-\begin{enumerate}
-\itemsep=-1pt 		% Adjusting item separation
-\itemindent=0pt 	% Extra indentation from the left margin if necessary
+\renewcommand\labelitemi{\small$\bullet$} % Change the size of the bullets in itemize
+\begin{itemize} 
+\itemsep=-1pt 		% Item separation between items
+\itemindent=-3pt 	% Extra indentation from the left margin if necessary
 \item 
 Time-To-Market (TTM) \\ \\
 The TTM factor is about how easy it is to enable an embedded system with collaterals
@@ -129,9 +130,8 @@ Design flexibilities \\ \\
 The design flexibilities revolve around two key questions of “How easy it is to include a
 new custom IP in a new design?” and “How easy it is to land firmware, driver, and
 software support of a new IP?"
-\end{enumerate}  
+\end{itemize}
 
-\subsection{Problem Statements}
 An ideal SOC would not only needs to be functional, but also be protected since the very early
 initialization flow to ensure no malicious code can be injected at any point before arriving at
 user space applications. To achieve this, firmware architecture becomes an important topic
@@ -146,16 +146,25 @@ can be added to the register transfer and firmware level to facilitate security 
 does not significantly jeopardize system performance and is easy to enable without much
 additional software development.
 
-
-\subsection{ Objectives}
-With the problem statement described, the key objective identified for this research is to
+The key objective identified for this research is to
 evaluate the secure firmware feature, measure it against boot performance, and propose
 security enhancement through Field Programmable Gate Array (FPGA) for firmware booting
 mechanism with the evaluated security features of an open-source ISA. This enhancement
 could be potentially scale to close-source ISA.
 
+In this paper, section 1 describes the introduction, problems and objectives of the study.
+Section 2 describes the background and previous work related to RISC-V processor, boot flow, and
+security. Section 3 describes the proposed method, which includes secure boot in Software (QEMU)
+and hardware implementation through FPGA. Section 4 describes the experimental setup results and
+discussion. Section 5 concludes the study and identify future improvement opportunities.
 
-\subsection{ Previous work}
+\section{ Background and previous work}
+
+\subsection{ RISC-V processor and security}
+TBD: Talk more about RISC-V..... Talk about the boot flow of RISC-V.
+Include ISA specifics, eg. section 2.4.3,  2.3.3
+
+\subsection{ Related work}
 In the past, many researches related to security features available in different ISA had been carried out.
 Ning et al analyzed several hardware assisted TEE such as Intel SGX, ARM TrustZone Technology
 and AMD SEV, and evaluated the feasibility of deploying them on edge compute infrastructure by evaluating the performance overhead \cite{R5:2}.
@@ -164,9 +173,12 @@ Other than performance evaluation, there are also comparative study on multiple 
 al summarized some key challenges of security features, short coming of ARM TrustZone and Intel SGX, and proposed countermeasures in RISC-V architecture that address its defined thread models \cite{R5:4}.
 In respective targeted technology domain, Pascal et al proposed HECTOR-V, a RISC-V based architecture to improve on the flexibilities of peripherals’ permission management \cite{R5:5}.Victor et al on the other hand, proposed Sanctum, a RISC-V based TEE to improve on software isolation with comparison to Intel SGX  \cite{R5:6}. There are also several researches that provide deep dive study and survey on existing technologies, for example, Intel SGX was deeply explained from different aspects from the technology use cases to vulnerabilities by Victor et al \cite{R5:7}, an ARM TrustZone comprehensive survey was carried out by Sandro et al \cite{R5:8} and multiple System Management Mode usage model for security purposes was analyzed by William in his PHD report \cite{R5:9}.
 
+Need to copy table 2.4 and 2.5.
+
 \section{ Proposed Method}
 The approach of the research to propose the methodology and collect results is demonstrated in Figure 1. In section 2.1, the platform alternatives are compared and selected. In section 2.2, secure boot implementation is proposed for RISC-V with firmware implementation in software emulated environment (QEMU). In section 2.3, secure boot implementation is proposed for RISC-V with RTL implementation in FPGA hardware environment. In section 2.4, experiments and parameters are proposed to evaluate the firmware and RTL implementation.
 
+\begin{comment}
 % Span figure example on double column
 \begin{figure}[hbt!]
 	\centering
@@ -200,6 +212,7 @@ A comparison between software emulation (QEMU), reference boards, and FPGA is cr
 	\caption{FPGA Selected}
 \end{figure}
 
+\end{comment}
 
 \subsection{ Secure Boot in Software/QEMU}
 The flow to identify secure boot ingredient has two key flows. The difference between the 2 flows are demonstrated as Figure 3, whereby the firmware is first being compiled and executed without any secure boot ingredient, then showcase how inject secure boot code and execute the firmware. As the firmware code boot stages are compiled as separate binaries, each of the binaries can be then hashed and verified.
@@ -274,46 +287,19 @@ Firmware size (size of the compiled binary)
 Number of logic gates consumed in RTL (FPGA resource consumed)
 \end{enumerate}
 
-To prove secured boot implementation, negative testing will be performed using unauthorized EFI applications that mimics malicious software to demonstrate that only signed applications can be executed. Therefore, the flow of experiments is planned with sequence below. \\
+To prove secured boot implementation, negative testing will be performed using unauthorized EFI applications that mimics malicious software to demonstrate that only signed applications can be executed. Therefore, the flow of experiments for software and hardware is planned respectively.
 
-Software QEMU:
-\begin{enumerate}
-\itemsep=-1pt 		% Adjusting item separation
-\itemindent=0pt 	% Extra indentation from the left margin if necessary
-\item 
-Compile a normal unsecured UEFI firmware for x86 and RISC-V.
-\item 
-Execute the UEFI firmware in QEMU, boot to Shell and capture the boot log.
-\item 
-Compile a secured UEFI firmware.
-\item 
-Execute the UEFI firmware in QEMU, boot to Shell and capture the boot log.
-\item 
-Perform negative testing with signed and unsigned EFI application using the secured UEFI firmware.
-\item 
-Capture the boot time of secured and unsecured firmware.
-\item 
-Compare the impact to boot time after incorporated security.
-\item 
-Capture the binary size of secured and unsecured firmware.
-\item 
-Compare the impact to firmware binary size after incorporated security.
-\end{enumerate}
+For Software QEMU, a normal unsecured UEFI firmware for x86 and RISC-V is compiled. Then, the UEFI firmware in QEMU is executed by booting to Shell and capturing the boot log.
+After this is achieved, a secured UEFI firmware is compiled. Then, the secured UEFI firmware in QEMU is executed by booting to Shell and capturing the boot log.
+With the secured UEFI firmware, negative testing is performeced with signed and unsigned EFI application.
+The boot time of secured and unsecured firmware are captured. With this and by comparing the results, the impact to boot time after incorporated security can be benchmarked.
+The binary size of secured and unsecured firmware are captured. With this and by comparing the results, the impact to firmware binary size after incorporated security can be benchmarked.
 
+For Hardware FPGA, the SHA512 block that interacts with other components in NEORV32 RISC-V processor is implemented.
+The SHA512 digest generated by the SHA512 block is captured and compare with the output of software execution to verify the correctness in functionality.
+The SHA512 digest generation time is captured to be compared with software execution time to verify the performance.
+The boot log of NEORV32 firmware is captured to verify the ability to access SHA512 digest generated by RTL in bootloaders.
 
-Hardware FPGA:
-\begin{enumerate}
-\itemsep=-1pt 		% Adjusting item separation
-\itemindent=0pt 	% Extra indentation from the left margin if necessary
-\item 
-Implement the SHA512 block that interacts with other components in NEORV32 RISC-V processor.
-\item 
-Capture the SHA512 digest generated by the SHA512 block and compare with the output of software execution to verify the correctness in functionality.
-\item 
-Capture the SHA512 digest generation time and compare with software execution time to verify the performance.
-\item 
-Capture the boot log of NEORV32 firmware to verify the ability to access SHA512 digest generated by RTL in bootloaders.
-\end{enumerate}
 
 \section{ Results/Discussion}
 From functional correctness perspective, secured boot is configured as Figure 9. With secure boot enabled, only application software that is being signed with the same keys will be able to execute. To validate this behavior, an unsigned “Hello World” application and a signed “Hello World” application is attempted to execute in EFI Shell environment. Figure 10 shows the unsigned application and Figure 11 shows the signed application. The commit ID used to produce this result is 392836a for efitools repository and 75e9154f81 for EDK2 repository.
