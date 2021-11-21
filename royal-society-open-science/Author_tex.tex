@@ -45,7 +45,7 @@ $^{2}$School of Electrical and Electronic Engineering, Universiti Sains Malaysia
 \begin{abstract}
 There are many well-known open-source bootloaders solutions available today such as UEFI/BIOS, Coreboot and Uboot.
 Recently, RISC-V as an open-source Instruction Set Architecture, has gained a lot of attention in new embedded products
-creation and academic research purpose. In this study, x86, ARM and RISC-V Instruction Set Architecture boot flow and
+creation and academic research purpose. In this study, RISC-V Instruction Set Architecture boot flow and
 boot solutions are studied, simulated, experimented, and summarized. Security feature is implemented in firmware and
 measured against non-secured firmware to compare boot performance without security inclusion. A new proposed method
 to create a security block in Register Transfer Level to generate Secure Hash Algorithms 5 digest is implemented using Field
@@ -176,18 +176,6 @@ In RISC-V, two security architectures stood out in addressing the challenges in 
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=1\textwidth]{figs/SanctumPageEntryTransformationLogic.JPG}
-	\caption{Sanctum Page Entry Transformation Logic in Rocket Core \cite{R5:6}}
-\end{figure}
-
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=1\textwidth]{figs/SanctumRoT.JPG}
-	\caption{Sanctum Root of Trust  \cite{R5:6}}
-\end{figure}
-
-\begin{figure}[hbt!]
-	\centering
 	\includegraphics[width=1\textwidth]{figs/SanctumSwStack.JPG}
 	\caption{Sanctum Software Stack TCB  \cite{R5:5}}
 \end{figure}
@@ -210,6 +198,67 @@ Other than performance evaluation, there are also comparative study on multiple 
 al summarized some key challenges of security features, short coming of ARM TrustZone and Intel SGX, and proposed countermeasures in RISC-V architecture that address its defined thread models \cite{R5:4}.
 In respective targeted technology domain, Pascal et al proposed HECTOR-V, a RISC-V based architecture to improve on the flexibilities of peripherals’ permission management \cite{R5:5}.Victor et al on the other hand, proposed Sanctum, a RISC-V based TEE to improve on software isolation with comparison to Intel SGX  \cite{R5:6}. There are also several researches that provide deep dive study and survey on existing technologies, for example, Intel SGX was deeply explained from different aspects from the technology use cases to vulnerabilities by Victor et al \cite{R5:7}, an ARM TrustZone comprehensive survey was carried out by Sandro et al \cite{R5:8} and multiple System Management Mode usage model for security purposes was analyzed by William in his PHD report \cite{R5:9}. The researchers work is summarized in Table 1.
 
+UEFI secure boot is independent of ISA architecture. It is part of the UEFI specification definition. The main goal is to have system firmware acting as a trusted entity to load any untrusted 3rd party firmware code, which includes bootloaders, payloads, or even operating system. To ensure UEFI secure boot is functional, an end user will need to enroll the secure boot security database with authenticated variables and sign untrusted applications to ensure that they are considered secure to execute.
+In a typical workflow, a 3rd party code provider will need to sign their components with a private key and publish the public key. Then the OEM or users can enroll the public key to the database, which is stored in a UEFI authenticated variable region \cite{R5:13}.  During firmware boot process, the image verification procedure will verify the 3rd party code according to the image security database, using a verification flow entailed in Figure.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figs/UefiSecureBootImageVerificationFlow.JPG}
+	\caption{UEFI secure boot image verification flow \cite{R5:13}}
+\end{figure}
+
+
+Intel Boot Guard is a solution that extends the secure boot’s root of trust from platform to the Platform Controller Hub (PCH). The mechanism contains a One-Time-Programmable (OTP) fuses that is burned to the chip during manufacturing process and that would be the hash of the master public key. This flow was described and productized in Dell EMC 14th generation server  \cite{R5:14} . Figure describes how to use a lower TCB (trusted computing base) to verify the stages from one to another. In this case, Authenticated Code Module (ACM) will verify PEI phase firmware volume, PEI will verify DXE phase firmware volume, and DXE will verify Operating System loader before hand over.
+
+Figure shows the existing secure boot flow in firmware whereby CPU would validate the integrity of bootloader after jumping out of reset. If the bootloader data is identified to be invalid, the bootloader execution will halt, this flow is also applicable to booting OS. This mechanism ensures that an unauthorized application will not be able to execute, thus enable firmware to be a trusted entity from attack of malicious applications.
+
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=1\textwidth]{figs/IntelBootGuard.JPG}
+	\caption{Intel Boot Guard \cite{R5:14}}
+\end{figure}
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{figs/ExistingSecureBootFlowInFirmware.JPG}
+	\caption{Existing Secure Boot Flow In Firmware \cite{R5:15}}
+\end{figure}
+
+Coreboot, an open source bootloader, implements verified boot, commonly known as vboot, which has very similar architecture as UEFI secure boot \cite{R5:16}. The root of trust is basically a read only portion of the SPI flash, which is commonly named as Google Binary Blob (GBB) area. This area contains a 4096- or 8192-bit public root RSA key that is used to verify the VBLOCK area to obtain the firmware signing key. During boot, the reset vector will copy the boot block in GBB and verify the next partition of the firmware code (FW\_MAIN\_A) to determine its legitimacy in executing it. The verification flow is demonstrated in Figure.
+ 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figs/CorebootVboot.JPG}
+	\caption{Coreboot vBoot \cite{R5:16}}
+\end{figure}
+
+Android Verified Boot (AVB) introduces the concept of LOCKED or UNLOCKED state. If a device is unlocked, the bootloader will proceed to boot even without any root of trust, where else in locked state, the bootloader would perform steps to verify boot using the pre-signed key hash in read only boot partition, which works in a very similar fashion as UEFI secure boot and Coreboot vboot. To change the device state, one can use “fastboot flashing [unlock | lock] command \cite{R5:17}.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figs/AndroidVerifiedBootWithRecoveryFlow.JPG}
+	\caption{Android Verified Boot With Recovery Flow \cite{R5:17}}
+\end{figure}
+
+
+
+In this related topic of interest in RISC-V world, a lightweight secure boot architecture on SOC was
+introduced by  \cite{R5:12}. This study
+introduced additional SHA3 hardware block to replace software-based authentication flow as
+demonstrated in Figure 10. With this approach, the benefits of hardware-based security
+scheme against software-based are highlighted
+
+% Span figure example on double column
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figs/AuthenticationFlowToImplementSecureBoot.JPG}
+	\caption{Authentication Flow To Implement Secure Boot \cite{R5:12}}
+\end{figure}
+
 \section{ Proposed Method}
 The approach of the research to propose the methodology and collect results is demonstrated in Figure 1. In section 2.1, the platform alternatives are compared and selected. In section 2.2, secure boot implementation is proposed for RISC-V with firmware implementation in software emulated environment (QEMU). In section 2.3, secure boot implementation is proposed for RISC-V with RTL implementation in FPGA hardware environment. In section 2.4, experiments and parameters are proposed to evaluate the firmware and RTL implementation.
 
@@ -219,14 +268,13 @@ The flow to identify secure boot ingredient has two key flows. The difference be
 
 Figure 11 describes the potential to apply UEFI secure boot to the existing RISC-V boot with the existing UEFI framework on x86 QEMU. The idea is to inject security stack in UEFI PEI and DXE phase so that the RISCV UEFI boot flow can have secure boot encapsulated. This topic was flagged as a potential enabling item by RISC-V presentation \cite{R5:10}. The security stack by UEFI services had been made available with OpenSSL as the underlayer library and a comprehensive technical report of this describing how to sign and incorporate the keys has been created by \cite{R5:11}. The algorithm to verify the hash of a firmware region is as illustrated as Algorithm 1.
 
+
 % Span figure example on double column
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=1\textwidth]{figs/SoftwareSecureBootFlow.JPG}
-	\caption{Software Secure Boot Flow}
+	\includegraphics[width=1\textwidth]{figs/SecureBootOnRISCV.JPG}
+	\caption{UEFI Secured Boot on RISC-V}
 \end{figure}
-
-
 
 \begin{algorithm}
  \caption{Flow illustration of secure boot in firmware}
@@ -246,12 +294,6 @@ compare the digest with a pre-saved digest in hardware root of trust\;
 \end{algorithm}
 
 
-% Span figure example on double column
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=1\textwidth]{figs/SecureBootOnRISCV.JPG}
-	\caption{UEFI Secured Boot on RISC-V}
-\end{figure}
 
 \subsection{ Hardware implementation through FPGA}
 Another part of the methodology is to propose a method to replace these secure boot services with RTL instead of bootloader code to effectively reduce flash size and improve boot performance. To achieve this, an open-source RISCV processor (NEORV32) is used as an initial environment. SHA512 digest generation block is then added to the RTL of NEORV32, and the digest generated is passed to bootloader via a new read only register block through the custom functions subsystem (CFS) IP. With this implementation, bootloader will no longer need to contain and execute security code to achieve security purpose. A bird-eye view of what is being added is illustrated in green boxes of Figure 12. The IP are customized to introduce an additional arbitration block with state machine that is capable to map the boot rom content to be sent to SHA512 security block to produce digest. Once digest data is produced, the arbitration block will notify custom functions subsystem block with a status complete bit together with 512-bit SHA information. 
@@ -267,13 +309,6 @@ Another part of the methodology is to propose a method to replace these secure b
 Figure 13 and figure 14 demonstrates the detailed comparison of system port map after Arbiter and SHA512 core is being added to NEOV32 CPU processor. The details of how the SHA512 core and arbiter block from signals level and how they are being consumed is described subsequently.
 
 Based on the connections shown in Figure 15, during normal boot up process, NEORV32 CPU fetches instructions from bootloader ROM to execute. The amount of memory mapped IO and functionalities depend heavily on how the CPU is connected to data bus and in this case, the custom functions system block. The custom functions system block defines an interface consist of offset of each data that bootloader can read and write data from. The SHA512 Core block is responsible for taking in blocks of data to hash, and then provide output of the digest once completed. Arbiter is the middleman which controls the operation of taking ROM data and send to SHA512 Core to be hashed. Once the hash operation is completed, the digest and the completion status will then be shared with custom functions system to be accessible by CPU, which translate to software accessible registers.
-
-% Span figure example on double column
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=1\textwidth]{figs/SystemPortMap-Original.JPG}
-	\caption{System port map of components without security block}
-\end{figure}
 
 % Span figure example on double column
 \begin{figure}[hbt!]
@@ -346,15 +381,8 @@ From functional correctness perspective, secured boot is configured as Figure 16
 % Span figure example on double column
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=1\textwidth]{figs/SecureBootUnsigned.JPG}
-	\caption{Load unsigned "Hello World" application}
-\end{figure}
-
-% Span figure example on double column
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=1\textwidth]{figs/SecureBootSigned.JPG}
-	\caption{Loading signed "Hello World" application}
+	\includegraphics[width=1\textwidth]{figs/SecureBootVsNormalBootPerformance.JPG}
+	\caption{Comparison of Secured boot performance with 2839ms boot time against Normal boot with 2092ms}
 \end{figure}
 
 From firmware size perspective, results collected indicates that non-secure UEFI firmware has a total of 7,602,384 bytes, while secure UEFI firmware has a total of 10,895,864 bytes. Therefore, it is deduced that from software perspective, implementing security in firmware will add additional 3.292 Megabytes (10.895M – 7.602M) of additional binary size.
@@ -379,7 +407,7 @@ In terms of security execution speed comparison, according to Table 2, it is obs
 \end{table}
 
 \section{ Conclusion}
-The objective of this research, which is to study each ISA security schemes, identify and evaluate boot performance with different secure boot scheme, and propose a security enhancement mechanism with open-source ISA, is accomplished. The boot time and boot size impact of implementing hashing for firmware is highlighted in Slim Bootloader verified boot comparison, which indicates that secured firmware incurred 3.3 Megabytes of additional binary size and 747ms (35\%) additional boot time compared to non-secured firmware. The hardware implementation also indicates that it requires an additional 32,048 logic gates to implement a SHA512 IP that reduce software execution time by 1132\%.
+The objective of this research, which is to study firmware security schemes, identify and evaluate boot performance with different secure boot scheme, and propose a security enhancement mechanism with open-source ISA, is accomplished. The boot time and boot size impact of implementing hashing for firmware is highlighted in Slim Bootloader verified boot comparison, which indicates that secured firmware incurred 3.3 Megabytes of additional binary size and 747ms (35\%) additional boot time compared to non-secured firmware. The hardware implementation also indicates that it requires an additional 32,048 logic gates to implement a SHA512 IP that reduce software execution time by 1132\%.
 
 Although this paper has demonstrated the secure boot implementations with QEMU and FPGA hardware, there are some enhancement to be done to enable security with minimal firmware or software involvement, driven by the initial problem statement. One example is how the configuration to update the RTL security scheme at runtime can be provided for better user experience. A suggestion is through a network IP with manageability mechanism for Over-The-Air (OTA) update, connecting with RISC-V network on chip cores, such as the OpenPiton Network on Chip (NOC) project and have a secure channel to modify the key hashes. This is another topic of research area that can be proposed and presented with industrial use cases with business opportunities to introduce such features on IOT secured devices.
 
