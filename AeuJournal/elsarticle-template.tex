@@ -77,7 +77,7 @@ riscv, security, firmware
 
 All compute devices today are powered by a few processors Instruction Set Architectures
 (ISAs), predominantly x86, AMD, ARM, and MIPS which is later converged to RISC-V in
-2021  \cite{R5:1}. These ISAs provide flexibilities and extensibilities to the
+2021 \cite{R5:1}. These ISAs provide flexibilities and extensibilities to the
 different engineering audiences, creating tremendous opportunities today that benefits
 consumer in many custom applications and use cases, especially in the booming edge devices
 in Internet of Things world. While having multiple ISA options are good, it is often difficult to
@@ -159,7 +159,7 @@ Figure 2 shows the existing secure boot flow in firmware whereby CPU would valid
 	\caption{Existing Secure Boot Flow In Firmware \cite{R5:15}}
 \end{figure}
 
-Intel Boot Guard is a solution that extends the secure boot’s root of trust from platform to the Platform Controller Hub (PCH). The mechanism contains a One-Time-Programmable (OTP) fuses that is burned to the chip during manufacturing process and that would be the hash of the master public key. This flow was described and productized in Dell EMC 14th generation server  \cite{R5:14} . Figure 3 describes how to use a lower TCB (trusted computing base) to verify the stages from one to another. In this case, Authenticated Code Module (ACM) will verify PEI phase firmware volume, PEI will verify DXE phase firmware volume, and DXE will verify Operating System loader before hand over.
+Intel Boot Guard is a solution that extends the secure boot’s root of trust from platform to the Platform Controller Hub (PCH). The mechanism contains a One-Time-Programmable (OTP) fuses that is burned to the chip during manufacturing process and that would be the hash of the master public key. This flow was described and productized in Dell EMC 14th generation server \cite{R5:14} . Figure 3 describes how to use a lower TCB (trusted computing base) to verify the stages from one to another. In this case, Authenticated Code Module (ACM) will verify PEI phase firmware volume, PEI will verify DXE phase firmware volume, and DXE will verify Operating System loader before hand over.
 
 \begin{figure}[H]
 	\centering
@@ -189,7 +189,7 @@ Android Verified Boot (AVB) introduces the concept of LOCKED or UNLOCKED state. 
 
 
 In this related topic of interest in RISC-V world, a lightweight secure boot architecture on SOC was
-introduced by  \cite{R5:12}. This study
+introduced by \cite{R5:12}. This study
 introduced additional SHA3 hardware block to replace software-based authentication flow as
 demonstrated in Figure 6. With this approach, the comparison between hardware-based security
 scheme against software-based are highlighted in the paper.
@@ -232,7 +232,7 @@ Therefore, in 2020, the boot stage is further standardized to use U-Boot and Ope
 
 Figure 9 from Atish et al. also demonstrated that FSBL, which was SiFive specific, will be replaced by Coreboot/U-boot SPL. U-boot will then act as the last stage boot loader before Linux. OpenSBI standard started as an ingredient that is specific only to RISC-V, which makes it important to understand what it does and how it evolved over time. Jagan presented in China RISC-V Forum 2019 shows the evolving of RISC-V Supervisor Binary Interface (SBI) to Open-Source Supervisor Binary Interface (OpenSBI). In summary of the specification changes, the system calls type interface layer between firmware runtime, M mode and S mode were made modular, scalable, and extendable between all CPU and Silicon specific hardware configuration. OpenSBI now contains platform independent and dependent libraries, which support SiFive U540, Andes AE350, Ariane FPGA, Kendryte K210 and QEMU \cite{R51:1}.
 
-The current RISCV boot stage ported to UEFI is initiated by Hewlett Packard Enterprise since 2015  \cite{R51:2}. It described some architectural changes with OpenSBI as a platform structure layer that is callable by services during UEFI boot flow, for example during SEC phase, SEC module would call the OpenSBI initialization and platform initialization code and then return to PEI core once done. In PEI phase, PEI module extracts device tree information constructed in OpenSBI to be further consumed in DXE driver. In DXE and OS run time, supervisor, and hypervisor ecall interface is made available for any run time service required from OpenSBI. This flow is simplified in Figure 10.
+The current RISCV boot stage ported to UEFI is initiated by Hewlett Packard Enterprise since 2015 \cite{R51:2}. It described some architectural changes with OpenSBI as a platform structure layer that is callable by services during UEFI boot flow, for example during SEC phase, SEC module would call the OpenSBI initialization and platform initialization code and then return to PEI core once done. In PEI phase, PEI module extracts device tree information constructed in OpenSBI to be further consumed in DXE driver. In DXE and OS run time, supervisor, and hypervisor ecall interface is made available for any run time service required from OpenSBI. This flow is simplified in Figure 10.
 
 \begin{figure}[hbt!]
 	\centering
@@ -253,7 +253,7 @@ In RISC-V, two security architectures stood out in addressing the challenges in 
 \begin{figure}[hbt!]
 	\centering
 	\includegraphics[width=1\textwidth]{figs/SanctumSwStack.JPG}
-	\caption{Sanctum Software Stack TCB  \cite{R5:5}}
+	\caption{Sanctum Software Stack TCB \cite{R5:5}}
 \end{figure}
 
 Another popular piece that explores using heterogenous multicore architecture to realize a secure TEE design in RISC-V is HECTOR-V. It has RISC-V Secure Co Processor (RVSCP) embedded to application processor that enable HECTOR-V with mechanism to establish secure communication channels between multiple devices connected to the CPU. Its architecture is described in Figure 13. With this proposed heterogenous architecture, RVSCP provides hardware enforced control flow integrity and restricts I/O accesses to certain execution states. Concurrently, SiFive also developed WorldGuard architecture. In this architecture, each core gets assigned a world ID and process of the core is annotated with process ID. This ID is transported using the interconnect and requests from participants are filtered by peripherals, the memory, and the caches. This is mostly similar to HECTOR-V’s design. The only difference is that WorldGuard transfer the security monitor ownership dynamically to any party for flexible use case, as compared to HECTOR that has concrete secure processor.
@@ -272,7 +272,7 @@ and AMD SEV, and evaluated the feasibility of deploying them on edge compute inf
 More security and performance benchmark study had been carried out by Christian et al and it has been discovered that AMD SEV has the best benchmark with memory protection mechanism at execution speed of near native speed compared to Intel SGX \cite{R5:3}.
 Other than performance evaluation, there are also comparative study on multiple ISAs. Geraldine et
 al summarized some key challenges of security features, short coming of ARM TrustZone and Intel SGX, and proposed countermeasures in RISC-V architecture that address its defined thread models \cite{R5:4}.
-In respective targeted technology domain, Pascal et al proposed HECTOR-V, a RISC-V based architecture to improve on the flexibilities of peripherals’ permission management \cite{R5:5}.Victor et al on the other hand, proposed Sanctum, a RISC-V based TEE to improve on software isolation with comparison to Intel SGX  \cite{R5:6}. There are also several researches that provide deep dive study and survey on existing technologies, for example, Intel SGX was deeply explained from different aspects from the technology use cases to vulnerabilities by Victor et al \cite{R5:7}, an ARM TrustZone comprehensive survey was carried out by Sandro et al \cite{R5:8} and multiple System Management Mode usage model for security purposes was analyzed by William in his PHD report \cite{R5:9}.
+In respective targeted technology domain, Pascal et al proposed HECTOR-V, a RISC-V based architecture to improve on the flexibilities of peripherals’ permission management \cite{R5:5}.Victor et al on the other hand, proposed Sanctum, a RISC-V based TEE to improve on software isolation with comparison to Intel SGX \cite{R5:6}. There are also several researches that provide deep dive study and survey on existing technologies, for example, Intel SGX was deeply explained from different aspects from the technology use cases to vulnerabilities by Victor et al \cite{R5:7}, an ARM TrustZone comprehensive survey was carried out by Sandro et al \cite{R5:8} and multiple System Management Mode usage model for security purposes was analyzed by William in his PHD report \cite{R5:9}.
 
 \section{ Proposed Method}
 In this section, secure boot implementation is proposed for RISC-V with firmware implementation in software emulated environment (QEMU) and enhanced with RTL implementation in FPGA hardware environment.
