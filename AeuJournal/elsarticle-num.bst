@@ -1,7 +1,7 @@
 %%
 %% This is file `elsarticle-num.bst',
 %% 
-%% Copyright 2007, 2008, 2009 Elsevier Ltd
+%% Copyright 2007-2015 Elsevier Ltd
 %% 
 %% This file is part of the 'Elsarticle Bundle'.
 %% ---------------------------------------------
@@ -17,7 +17,7 @@
 %% given in the file `manifest.txt'.
 %% 
 %%
-%% $Id: elsarticle-num.bst 19 2009-12-17 07:07:52Z rishi $
+%% $Id: elsarticle.cls,v 1.20 2008-10-13 04:24:12 cvr Exp $
 %%
 %%
 %% ----------------------------------------
@@ -62,12 +62,12 @@ FUNCTION {init.urlbst.variables}
   "Available from: " 'urlintro := % prefix before URL
   "http://arxiv.org/abs/" 'eprinturl := % prefix to make URL from eprint ref
   "arXiv:" 'eprintprefix := % text prefix printed before eprint ref
-  "http://dx.doi.org/" 'doiurl := % prefix to make URL from DOI
-  "doi:" 'doiprefix :=      % text prefix printed before DOI ref
+  "https://doi.org/" 'doiurl := % prefix to make URL from DOI
+  "doi: " 'doiprefix :=      % text prefix printed before DOI ref
   #1 'addeprints :=         % 0=no eprints; 1=include eprints
   #1 'adddoiresolver :=     % 0=no DOI resolver; 1=include it
-  #2 'hrefform :=           % 0=no crossrefs; 1=hypertex xrefs; 2=hyperref refs
-  #1 'inlinelinks :=        % 0=URLs explicit; 1=URLs attached to titles
+  #0 'hrefform :=           % 0=no crossrefs; 1=hypertex xrefs; 2=hyperref refs
+  #0 'inlinelinks :=        % 0=URLs explicit; 1=URLs attached to titles
   % the following are internal state variables, not config constants
   #0 'makeinlinelink :=     % state variable managed by setup.inlinelink
   "" 'openinlinelink :=     % ditto
@@ -207,6 +207,7 @@ FUNCTION {output.check}
 
 FUNCTION {fin.entry.original}
 { add.period$
+  %", " *
   write$
   newline$
 }
@@ -326,7 +327,7 @@ FUNCTION {bbl.edition}
 { "Edition" }
 
 FUNCTION {bbl.volume}
-{ "Vol." }
+{ "vol." }
 
 FUNCTION {bbl.of}
 { "of" }
@@ -353,10 +354,10 @@ FUNCTION {bbl.techrep}
 { "Tech. Rep." }
 
 FUNCTION {bbl.mthesis}
-{ "Master's thesis" }
+{ "M.Sc. Thesis" }
 
 FUNCTION {bbl.phdthesis}
-{ "Ph.D. thesis" }
+{ "Ph.D. Thesis" }
 
 FUNCTION {bbl.first}
 { "1st" }
@@ -471,10 +472,69 @@ MACRO {toplas} {"ACM Trans. Prog. Lang. Syst."}
 
 MACRO {tcs} {"Theoretical Comput. Sci."}
 
+%% Begin - Added on March 13, 2013
+
+MACRO {aj} {"Astron. J."} 
+MACRO {actaa} {"Acta Astron."}
+MACRO {araa} {"Annu. Rev. Astron. Astrophys."}
+MACRO {apj}  {"Astrophys. J."}
+MACRO {apjl} {"Astrophys. J. Lett."}
+MACRO {apjs} {"Astrophys. J. Suppl. S"}
+MACRO {ao} {"Appl. Optics"}
+MACRO {apss} {"Astrophys. Space Sci."}
+MACRO {aap} {"Astronom. Astrophys."}
+MACRO {aapr} {"Astron. Astrophys Rev"}
+MACRO {aaps} {"Astron. Astrophys. Sup."}
+MACRO {azh} {"Astron. Zh+"}
+MACRO {caa} {"Chinese Astron. Astr."}
+MACRO {icarus} {"Icarus"}
+MACRO {jcap} {"J. Cosmol. Astropart. Phys."}
+MACRO {jrasc} {"J. Roy. Astron. Soc. Can."}
+MACRO {memras} {"Memoirs of the RAS"}
+MACRO {mnras} {"Mon. Not. R. Astron. Soc."}
+MACRO {na} {"New Astron."}
+MACRO {nar} {"New Astron. Rev."}
+MACRO {pra} {"Phys. Rev. A"}
+MACRO {prb} {"Phys. Rev. B"}
+MACRO {prc} {"Phys. Rev. C"}
+MACRO {prd} {"Phys. Rev. D"}
+MACRO {pre} {"Phys. Rev. E"}
+MACRO {prl} {"Phys. Rev. Lett"}
+MACRO {pasa} {"Publ. Astron. Soc. Aust."}
+MACRO {pasp} {"Publ. Astron. Soc. Pac."}
+MACRO {pasj} {"Publ. Astron. Soc. Jpn."}
+MACRO {rmxaa} {"Rev. Mex. Astron. Astr."}
+MACRO {rjras} {"Q. J. Roy. Astron. Soc."}
+MACRO {skytel} {"Sky Telescope"}
+MACRO {solphys} {"Sol. Phys."}
+MACRO {sovast} {"Sov. Astron."}
+MACRO {ssr} {"Space Sci. Rev."}
+MACRO {zap} {"Zeitschrift fuer Astrophysik"}
+MACRO {nat} {"Nature"}
+MACRO {iaucirc} {"IAU Cirulars"}
+MACRO {gca} {"Geochim. Cosmochim. Ac."}
+MACRO {grl} {"Geophys. Res. Lett."}
+MACRO {jcp} {"J. Chem. Phys."}
+MACRO {jgr} {"J. Geophys. Res."}
+MACRO {jqsrt} {"J. Quant. Spectrosc. RA"}
+MACRO {nphysa} {"Nucl. Phys. A"}
+MACRO {physrep} {"Phys. Rep."}
+MACRO {physscr} {"Phys. Scrip."}
+MACRO {planss} {"Planet. Space Sci."}
+MACRO {baas} {"Bull. Aust. Acoust. Soc"}
+MACRO {aplett} {"Astrophys. Lett."}
+MACRO {procspie} {"Proc. SPIE"}
+MACRO {cjaa} {"Chinese J. Astron. Ast."}
+MACRO {fcp} {"Fundam. Cosm. Phys."}
+MACRO {memsai} {"Mem. Soc. Astron. Ital."}
+MACRO {bain} {"Bull. Astron. Inst. Neth., Suppl. Ser."}
+
+%% End - Added on March 13, 2013
+
 FUNCTION {write.url}
 { url empty$
     { skip$ }
-    { "\newline\urlprefix\url{" url * "}" * write$ newline$ }
+    { "\urlprefix\url{" url * "}" * add.period$ write$ newline$ } %add.period$
   if$
 }
 
@@ -487,7 +547,7 @@ FUNCTION {format.names}
   numnames 'namesleft :=
     { namesleft #0 > }
     { s nameptr
-      "{f.~}{vv~}{ll}{, jj}" format.name$
+      "{f{.}.~}{vv~}{ll}{, jj}" format.name$
     't :=
       nameptr #1 >
         {
@@ -1059,7 +1119,7 @@ FUNCTION {format.url}
    { hrefform #1 =
        { % special case -- add HyperTeX specials
          urlintro "\url{" url * "}" * url make.href.hypertex * }
-       { urlintro "\url{" * url * "}" * }
+       { "" }
      if$
    }
   if$
@@ -1479,7 +1539,7 @@ FUNCTION {begin.bib}
   write$ newline$
   "  \def\url#1{\texttt{#1}}\fi"
   write$ newline$
-  "\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi"
+  "\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL: }\fi"
   write$ newline$
   "\expandafter\ifx\csname href\endcsname\relax"
   write$ newline$
@@ -1503,5 +1563,3 @@ EXECUTE {end.bib}
 %% End of customized bst file
 %%
 %% End of file `elsarticle-num.bst'.
-
-
