@@ -82,36 +82,11 @@ different engineering audiences, creating tremendous opportunities today that be
 consumer in many custom applications and use cases, especially in the booming edge devices
 in Internet of Things world. While having multiple ISA options are good, it is often difficult to
 make a good decision on which architecture to go for, because there are many factors that
-contribute to design decision. Several key elements of consideration while picking an ISA are as below.
+contribute to design decision of a System on Chip (SOC), such as security, features offering,
+Time-To-Market (TTM), and cost. This paper focus on the security and firmware aspect of it.
 
-\renewcommand\labelitemi{\small$\bullet$} % Change the size of the bullets in itemize
-\begin{itemize} 
-\itemsep=-1pt 		% Item separation between items
-\itemindent=-3pt 	% Extra indentation from the left margin if necessary
-\item 
-Time-To-Market (TTM) \\ \\
-The TTM factor is about how easy it is to enable an embedded system with collaterals
-provided by the ISA provider. For example, the development time of an engineering team
-(often called OEM/ODM) taking a new 11th Generation Intel chip and providing a full
-solution with it. Several key factors that directly impact TTM are the availabilities of
-documentation, system level open-source references and manufacturing technology.
-\\
-
-\item 
-Cost \\ \\
-This factor includes cost of licensing, software, and hardware development cost that the
-OEM/ODM needs to pay to get the products released.
-\\
-
-\item 
-Design flexibilities \\ \\
-The design flexibilities revolve around two key questions of “How easy it is to include a
-new custom IP in a new design?” and “How easy it is to land firmware, driver, and
-software support of a new IP?"
-\end{itemize}
-
-An ideal SOC would not only needs to be functional, but also be protected since the very early
-initialization flow to ensure no malicious code can be injected at any point before arriving at
+From security perspective, an ideal SOC would not only needs to be functional, but also be protected
+from the very early initialization flow to ensure no malicious code can be injected at any point before arriving at
 user space applications. To achieve this, firmware architecture becomes an important topic
 of exploration to identify the security scheme offered with different ISA and how a generic
 security approach can be deployed to implement security in each of them. The gap of today’s
@@ -196,7 +171,6 @@ scheme against software-based are highlighted in the paper.
 
 % Span figure example on double column
 \begin{figure}[H]
-	\centering
 	\includegraphics[width=1\textwidth]{figs/AuthenticationFlowToImplementSecureBoot.JPG}
 	\caption{Authentication Flow To Implement Secure Boot \cite{R5:12}}
 \end{figure}
@@ -205,17 +179,17 @@ scheme against software-based are highlighted in the paper.
 \subsection{ RISC-V processor and security}
 RISC-V boot flow consists of ROM, loader, runtime, boot loader and OS, which aligns to the RISC processor modes that go from the most privileged mode to the least privileged mode as Figure 7 demonstrated. 
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\centering
-	\includegraphics{figs/ArmAndRiscVProcessorModesComparison.JPG}
+	\includegraphics[width=1\textwidth,height=2in]{figs/ArmAndRiscVProcessorModesComparison.JPG}
 	\caption{ARM and RISC-V Processor Modes Comparison}
 \end{figure}
 
 Figure 7 also shows that all stages (Firmware, Hypervisor, OS, User space) are executed in sequence of exception levels like ARM64 fashion. ARM’s EL3 has platform specific runtime firmware and has secure privileges, while RISC-V’s M mode has platform specific firmware only and does not have secure privilege. ARM started with EL3, which is a secure world, while RISC-V starts from M mode, which is a bare metal machine code. The non-secure bootloaders in ARM uses ARM trusted firmware to switch to EL2, while RISC-V uses OpenSBI to switch into S-Mode from M-Mode. Also, ARM is close source while RISC-V is open source. Therefore, due to the open-source nature of RISC-V, the firmware stages between ROM code and OS (kernel space) are extremely flexible.
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\centering
-	\includegraphics{figs/DifferentFirmwareFlowsForRiscV.JPG}
+	\includegraphics[width=1\textwidth,height=3in]{figs/DifferentFirmwareFlowsForRiscV.JPG}
 	\caption{Different Firmware Flows For RISC-V \cite{R51:1}}
 \end{figure}
 
@@ -224,9 +198,9 @@ Figure 8 shows some examples of different combinations possible after the “Zer
 
 Therefore, in 2020, the boot stage is further standardized to use U-Boot and OpenSBI as the only open source accepted methodology. Figure 9 shows the upstream boot flow where OpenSBI sits right in the middle of boot phase between M-mode (firmware) and S-mode (U-boot) to provide all runtime services.
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\centering
-	\includegraphics{figs/RiscVStandardBootFlow.JPG}
+	\includegraphics[width=1\textwidth,height=3in]{figs/RiscVStandardBootFlow.JPG}
 	\caption{RISC-V Standard Boot Flow \cite{R51:1}}
 \end{figure}
 
@@ -234,7 +208,7 @@ Figure 9 from Atish et al. also demonstrated that FSBL, which was SiFive specifi
 
 The current RISCV boot stage ported to UEFI is initiated by Hewlett Packard Enterprise since 2015 \cite{R51:2}. It described some architectural changes with OpenSBI as a platform structure layer that is callable by services during UEFI boot flow, for example during SEC phase, SEC module would call the OpenSBI initialization and platform initialization code and then return to PEI core once done. In PEI phase, PEI module extracts device tree information constructed in OpenSBI to be further consumed in DXE driver. In DXE and OS run time, supervisor, and hypervisor ecall interface is made available for any run time service required from OpenSBI. This flow is simplified in Figure 10.
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth,height=3in]{figs/HighLevelOverviewOfEfi.JPG}
 	\caption{High Level Overview Of EFI Execution Phases with RISC-V \cite{R51:2}}
@@ -242,7 +216,7 @@ The current RISCV boot stage ported to UEFI is initiated by Hewlett Packard Ente
 
 The boot phase porting from RISCV essential services to UEFI framework involves more than just adding OpenSBI libraries as another underlayer service. It also entails a volume top file (VTF) that generates a reset vector for UEFI bootloader to jump into, binding processor, converting RISCV ELF format to PE COFF, and porting of other UEFI libraries such as base memory, DXE real time clock, CPU arch, timer arch, reset protocol and CSR (control status registers). A MSCRATCH CSR is used to maintain a V machine mode trap handler in each of the boot phases (SEC, PEI, DXE core). More details of these work in each boot phase are simplified in Figure 11.
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth,height=3in]{figs/RiscVDetailedEfiFlow.JPG}
 	\caption{Detailed EFI Execution Phases with RISC-V \cite{R51:2}}
@@ -250,7 +224,7 @@ The boot phase porting from RISCV essential services to UEFI framework involves 
 
 In RISC-V, two security architectures stood out in addressing the challenges in x86 and ARM world today, namely Sanctum \cite{R5:6} and HECTOR-V \cite{R5:5}. Sanctum provides a similar enclave like concept as Intel SGX. Enclave page table registers and walker/transform logic are added on top of the LLC cache logic. On top of that, it adds measurement root of trust in a temper-resistant hardware. The goal of Sanctum is to target side channel attack that was claimed not covered in Intel SGX. This is achieved by adding page entry transformation logic. The root of trust resides in the CPU ROM where the code reads security monitor from untrusted flash memory and generate key based on monitor’s hash. The software stack of an enclave is designed in a way that user’s sanctum-aware runtime code and data communicate directly to the security monitor in machine’s measurement root as Figure 12.
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{figs/SanctumSwStack.JPG}
 	\caption{Sanctum Software Stack TCB \cite{R5:5}}
@@ -258,7 +232,7 @@ In RISC-V, two security architectures stood out in addressing the challenges in 
 
 Another popular piece that explores using heterogenous multicore architecture to realize a secure TEE design in RISC-V is HECTOR-V. It has RISC-V Secure Co Processor (RVSCP) embedded to application processor that enable HECTOR-V with mechanism to establish secure communication channels between multiple devices connected to the CPU. Its architecture is described in Figure 13. With this proposed heterogenous architecture, RVSCP provides hardware enforced control flow integrity and restricts I/O accesses to certain execution states. Concurrently, SiFive also developed WorldGuard architecture. In this architecture, each core gets assigned a world ID and process of the core is annotated with process ID. This ID is transported using the interconnect and requests from participants are filtered by peripherals, the memory, and the caches. This is mostly similar to HECTOR-V’s design. The only difference is that WorldGuard transfer the security monitor ownership dynamically to any party for flexible use case, as compared to HECTOR that has concrete secure processor.
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=1\textwidth]{figs/Hector.JPG}
 	\caption{Hector-V architecture}
@@ -273,6 +247,8 @@ More security and performance benchmark study had been carried out by Christian 
 Other than performance evaluation, there are also comparative study on multiple ISAs. Geraldine et
 al summarized some key challenges of security features, short coming of ARM TrustZone and Intel SGX, and proposed countermeasures in RISC-V architecture that address its defined thread models \cite{R5:4}.
 In respective targeted technology domain, Pascal et al proposed HECTOR-V, a RISC-V based architecture to improve on the flexibilities of peripherals’ permission management \cite{R5:5}.Victor et al on the other hand, proposed Sanctum, a RISC-V based TEE to improve on software isolation with comparison to Intel SGX \cite{R5:6}. There are also several researches that provide deep dive study and survey on existing technologies, for example, Intel SGX was deeply explained from different aspects from the technology use cases to vulnerabilities by Victor et al \cite{R5:7}, an ARM TrustZone comprehensive survey was carried out by Sandro et al \cite{R5:8} and multiple System Management Mode usage model for security purposes was analyzed by William in his PHD report \cite{R5:9}.
+
+The advantages of all the mentioned research are the comprehensive information about each TEE technologies, good comparative studies on the performance, and detailed analysis on the security coverages from thread modelling. However, it appears that most of the studies had very little analysis on firmware alternatives, architecture and security frameworks associated with it. This creating opportunities to research and provide enhancement in the domain of RISC-V firmware security.
 
 \section{ Proposed Method}
 In this section, secure boot implementation is proposed for RISC-V with firmware implementation in software emulated environment (QEMU) and enhanced with RTL implementation in FPGA hardware environment.
@@ -334,7 +310,7 @@ Based on the connections shown in Figure 16, during normal boot up process, NEOR
 % Span figure example on double column
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=1\textwidth]{figs/StateMachine.JPG}
+	\includegraphics[width=0.8\textwidth]{figs/StateMachine.JPG}
 	\caption{State machine of arbitration block}
 \end{figure}
 
@@ -391,12 +367,19 @@ From functional correctness perspective, secured boot is configured as Figure 18
 	\caption{Secure boot configuration}
 \end{figure}
 
-% Span figure example on double column
-\begin{figure}[hbt!]
-	\centering
-	\includegraphics[width=1\textwidth]{figs/SecureBootVsNormalBootPerformance.JPG}
-	\caption{Comparison of Secured boot performance with 2839ms boot time against Normal boot with 2092ms}
-\end{figure}
+\begin{table}[hbt!]
+\caption{Secured boot and non-secured boot Performance Comparison}
+    \begin{tabular}{|p{0.3\linewidth} | p{0.65\linewidth} |}
+        \hline
+         & Execution Time with same 2.2GHz frequency CPU\\
+        \hline 
+        Secured boot & 2839 ms  \\
+        \hline
+        Non-secured boot & 2092 ms \\
+        \hline
+    \end{tabular}
+\end{table}
+
 
 From firmware size perspective, results collected indicates that non-secure UEFI firmware has a total of 7,602,384 bytes, while secure UEFI firmware has a total of 10,895,864 bytes. Therefore, it is deduced that from software perspective, implementing security in firmware will add additional 3.292 Megabytes (10.895M – 7.602M) of additional binary size.
 
@@ -407,12 +390,12 @@ From hardware perspective, results collected indicates that a RISC-V based NEORV
 In terms of security execution speed comparison, according to Table 2, it is observed that producing a SHA512 digest for 896 bits data will take 257us with software while RTL implementation takes 227ns. The performance advantage is therefore 257u/227n * 100 = 1132\%.
 
 \begin{table}[hbt!]
-\caption{Hardware and Software Performance Comparison}
-    \begin{tabular}{|p{0.3\linewidth} | p{0.4\linewidth} |}
+\caption{Secured boot on Hardware and Software Performance Comparison}
+    \begin{tabular}{|p{0.3\linewidth} | p{0.65\linewidth} |}
         \hline
          & Execution Time with 2.2GHz frequency CPU using same set of data \\
         \hline 
-        Software execution & 257 us  \\
+        Software execution & 257000 ns  \\
         \hline
         Hardware execution & 227 ns \\
         \hline
