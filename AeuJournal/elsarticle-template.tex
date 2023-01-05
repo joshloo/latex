@@ -117,7 +117,7 @@ discussion. Section 5 concludes the study and identify future improvement opport
 
 \subsection{Secure Boot}
 UEFI secure boot is independent of ISA architecture. It is part of the UEFI specification definition. The main goal is to have system firmware acting as a trusted entity to load any untrusted 3rd party firmware code, which includes bootloaders, payloads, or even operating system. To ensure UEFI secure boot is functional, an end user will need to enroll the secure boot security database with authenticated variables and sign untrusted applications to ensure that they are considered secure to execute.
-In a typical workflow, a 3rd party code provider will need to sign their components with a private key and publish the public key. Then the OEM or users can enroll the public key to the database, which is stored in a UEFI authenticated variable region \cite{R5:13}.  During firmware boot process, the image verification procedure will verify the 3rd party code according to the image security database, using a verification flow entailed in Figure 1.
+In a typical workflow, a 3rd party code provider will need to sign their components with a private key and publish the public key. Then users can enroll the public key to the database, which is stored in a UEFI authenticated variable region \cite{R5:13}.  During firmware boot process, the image verification procedure will verify the 3rd party code according to the image security database, using a verification flow entailed in Figure 1.
 
 
 \begin{figure}[H]
