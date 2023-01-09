@@ -105,7 +105,14 @@ The key objective identified for this research is to
 evaluate the secure firmware feature, measure it against boot performance, and propose
 security enhancement through Field Programmable Gate Array (FPGA) for firmware booting
 mechanism with the evaluated security features of an open-source ISA. This enhancement
-could be potentially scale to close-source ISA.
+could be potentially scale to close-source ISA. In this study, we concentrate on security, firmware and 
+register-transfer level (RTL). Some of the major contributions of this research are:
+
+ \begin{itemize}
+  \item Evaluated security implementations of x86 and RISC-V across multiple boot solutions (UEFI, Coreboot, OpenSBI).
+  \item Researched existing secure boot signing efficiency through software algorithms.
+  \item Proposed a hardware RTL implementation to establish firmware security that reduce boot time significantly.
+\end{itemize}
 
 In this paper, section 1 describes the introduction, problems and objectives of the study.
 Section 2 describes the background and previous work related to RISC-V processor, boot flow, and
